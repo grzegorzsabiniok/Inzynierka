@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HDL": {
+      "commandName": "Project",
+      "commandLineArgs": "compile test"
+    }
+  }
+}
