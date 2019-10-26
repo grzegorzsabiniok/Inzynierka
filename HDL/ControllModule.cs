@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using HDL.CLI;
+using HDL.Compiler;
 using HDL.Parser;
 using File = System.IO.File;
 
@@ -18,7 +19,7 @@ namespace HDL.Controll
             packageFolder = "packages",
             outputFolder = "output",
             configFile = "config.json",
-            mainSourceFile = "main",
+            mainSourceFile = "Main",
             sourceFileExtension = ".s";
 
         public ControllModule(CLIManager userInterface)
@@ -71,11 +72,16 @@ namespace HDL.Controll
             Console.WriteLine($"Load {sourceFiles.Count} files");
             sourceFiles.ForEach(x => Console.WriteLine("\t" + x.Name));
 
-            var parser = new ParserController(sourceFiles);
-            parser.Start(() =>
+            var compiler = new CompilerController(structure => { });
+
+            var parser = new ParserController(x =>
             {
-                Console.WriteLine("Parsing complete");
+                Console.WriteLine($"{x.Count} tokens finded");
+                compiler.Start(x);
             });
+
+            parser.Start(sourceFiles);
+
         }
 
         public void Run()

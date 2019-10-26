@@ -9,7 +9,7 @@ namespace HDL.Parser
     {
         private List<string> separators = new List<string>()
         {
-            " ","\n","\r","\t",",","{","}","(",")",";","<=","!"
+            " ","\n","\r","\t",",","{","}","(",")",";","<=","!","."
         };
 
         private List<string> worthless = new List<string>()
@@ -19,20 +19,19 @@ namespace HDL.Parser
 
         private List<string> keywords = new List<string>()
         {
-            "module","gates"
+            "module","gate"
         };
 
         private List<Token> tokens;
+        private Action<List<Token>> onComplete;
 
-        private List<File> files;
-
-        public ParserController(List<File> files)
+        public ParserController(Action<List<Token>> onComplete)
         {
-            this.files = files;
+            this.onComplete = onComplete;
             Token.Keywords = keywords;
         }
 
-        public void Start(Action OnComplete)
+        public void Start(List<File> files)
         {
             tokens = new List<Token>();
             files.ForEach(x => ProcessFile(x));
@@ -40,7 +39,7 @@ namespace HDL.Parser
             //cleaning
             tokens.RemoveAll(x => worthless.Contains(x.Value));
 
-            tokens.ForEach(x => Console.WriteLine(x));
+            onComplete?.Invoke(tokens);
         }
 
         private void ProcessFile(File file)
@@ -55,7 +54,7 @@ namespace HDL.Parser
 
         private void ProcessLine(string line, int lineNumber, File file)
         {
-            string saver = "";
+            string textAgregator = "";
             for (int i = 0; i < line.Length; i++)
             {
                 if (FindSeparator(line, i, "//"))
@@ -69,9 +68,9 @@ namespace HDL.Parser
                 {
                     tokens.Add(new Token()
                     {
-                        Value = saver,
+                        Value = textAgregator,
                         Line = lineNumber,
-                        Position = i - saver.Length,
+                        Position = i - textAgregator.Length,
                         File = file
                     });
 
@@ -80,18 +79,17 @@ namespace HDL.Parser
 
                     tokens.Add(findedSeparator);
 
-                    saver = "";
+                    textAgregator = "";
                     i += findedSeparator.Value.Length - 1;
                 }
                 else
                 {
-                    saver += line[i];
+                    textAgregator += line[i];
                 }
             }
         }
         private Token FindSeparator(string input, int position)
         {
-
             separators = separators.OrderByDescending(x => x.Length).ToList();
 
             foreach (var x in separators)
