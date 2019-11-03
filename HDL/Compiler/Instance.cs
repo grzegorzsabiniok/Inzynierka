@@ -21,5 +21,13 @@ namespace HDL.Compiler
             Inputs = Module.Inputs.Select(x => new Pin(x.Name)).ToList();
             Outputs = Module.Outputs.Select(x => new Pin(x.Name)).ToList();
         }
+
+        public Instance(Module module, string name)
+        {
+            Name = name;
+            Module = module;
+            Inputs = Module.Inputs.Select(x => new Pin(x.Name)).ToList();
+            Outputs = Module.Outputs.Select(x => new Pin(x.Name)).ToList();
+        }
     }
 }

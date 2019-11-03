@@ -17,6 +17,8 @@ namespace HDL.Compiler
 
         public List<Instance> Gates = new List<Instance>();
 
+        public bool IsAtomic = false;
+
         private List<Token> tokens;
 
         public static List<Module> Modules = new List<Module>();

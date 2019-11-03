@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using HDL.CLI;
 using HDL.Compiler;
+using HDL.HDLGenerator;
 using HDL.Parser;
 using File = System.IO.File;
 
@@ -72,7 +73,14 @@ namespace HDL.Controll
             Console.WriteLine($"Load {sourceFiles.Count} files");
             sourceFiles.ForEach(x => Console.WriteLine("\t" + x.Name));
 
-            var compiler = new CompilerController(structure => { });
+
+            var compiler = new CompilerController(result =>
+                {
+                    new VHDLGeneratorController().GenerateCode(result, code =>
+                    {
+                        File.WriteAllText(Path.Combine(projectPath, outputFolder, "main.vhd"), code);
+                    });
+                });
 
             var parser = new ParserController(x =>
             {
