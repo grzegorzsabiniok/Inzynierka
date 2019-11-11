@@ -142,7 +142,7 @@ namespace HDL.Compiler
 
             if (negation)
             {
-                var negationPin1 = new Pin(pin.Name + "_W");
+                var negationPin1 = new Pin(pin.Name);
                 var negationGate = new Negation(negationPin1);
 
                 Links.Add(new Link(

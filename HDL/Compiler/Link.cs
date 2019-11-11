@@ -7,16 +7,11 @@ namespace HDL.Compiler
 {
     class Link
     {
-        public List<Pin> Pins;
+        public List<Pin> Pins { get; set; }
 
         public Link(params Pin[] pins)
         {
             Pins = new List<Pin>(pins);
-        }
-
-        public Link(Link link)
-        {
-            Pins = link.Pins.ToList();
         }
     }
 }

@@ -7,8 +7,8 @@ namespace HDL.Compiler
 {
     class CompileResult
     {
-        public List<Gate> Gates;
-        public List<Signal> Inputs;
-        public List<Signal> Outputs;
+        public List<Gate> Gates { get; set; }
+        public List<Signal> Inputs { get; set; }
+        public List<Signal> Outputs { get; set; }
     }
 }

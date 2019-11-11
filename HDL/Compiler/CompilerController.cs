@@ -12,6 +12,11 @@ namespace HDL.Compiler
         private Action<CompileResult> onComplite;
         private Action<Token, string> onError;
 
+        private CompileResult result;
+
+        private List<Signal> signals = new List<Signal>();
+        private List<Gate> gates = new List<Gate>();
+
         public CompilerController(List<Token> tokens, Action<CompileResult> onComplite, Action<Token, string> onError = null)
         {
             this.onComplite = onComplite;
@@ -62,10 +67,7 @@ namespace HDL.Compiler
             return null;
         }
 
-        private CompileResult result;
 
-        private List<Signal> signals = new List<Signal>();
-        private List<Gate> gates = new List<Gate>();
         private void GenerateGates(Module mainModule)
         {
             if (mainModule == null)
