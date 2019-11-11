@@ -21,16 +21,19 @@ namespace HDL.CLI
 
             switch (runArguments[0])
             {
-                case "create": controllModule.CreateProject(runArguments[1]); break;
+                case "create":
+                    controllModule.CreateProject(runArguments[1]);
+                    break;
                 case "compile":
+                    if (runArguments.Length > 1)
                     {
-                        if (runArguments.Length > 1)
-                        {
-                            Directory.SetCurrentDirectory(Path.Combine(Directory.GetCurrentDirectory(), runArguments[1]));
-                        }
-                        controllModule.Compile(); break;
+                        Directory.SetCurrentDirectory(Path.Combine(Directory.GetCurrentDirectory(), runArguments[1]));
                     }
-
+                    controllModule.Compile(); break;
+                case "help":
+                    Console.WriteLine("write create <project name> to create project");
+                    Console.WriteLine("write compile <project name> to compile project");
+                    break;
             }
         }
     }

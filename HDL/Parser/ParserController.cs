@@ -19,22 +19,23 @@ namespace HDL.Parser
 
         private List<string> keywords = new List<string>()
         {
-            "module","gate"
+            "module","instance"
         };
 
         private List<Token> tokens;
         private Action<List<Token>> onComplete;
 
-        public ParserController(Action<List<Token>> onComplete)
+        public ParserController(List<File> files, Action<List<Token>> onComplete)
         {
             this.onComplete = onComplete;
             Token.Keywords = keywords;
+            Start(files);
         }
 
         public void Start(List<File> files)
         {
             tokens = new List<Token>();
-            files.ForEach(x => ProcessFile(x));
+            files.ForEach(ProcessFile);
 
             //cleaning
             tokens.RemoveAll(x => worthless.Contains(x.Value));
@@ -119,10 +120,7 @@ namespace HDL.Parser
                 }
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     }
 }

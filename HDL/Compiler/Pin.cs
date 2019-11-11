@@ -9,6 +9,11 @@ namespace HDL.Compiler
     {
         public string Name;
 
+        public Pin()
+        {
+            Name = "undefined";
+        }
+
         public Pin(string name)
         {
             Name = name;

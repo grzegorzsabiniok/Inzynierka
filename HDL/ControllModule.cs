@@ -19,9 +19,10 @@ namespace HDL.Controll
             sourceFolder = "source",
             packageFolder = "packages",
             outputFolder = "output",
+            outputFileName = "main.vhd",
             configFile = "config.json",
             mainSourceFile = "Main",
-            sourceFileExtension = ".s";
+            sourceFileExtension = ".mod";
 
         public ControllModule(CLIManager userInterface)
         {
@@ -71,30 +72,21 @@ namespace HDL.Controll
                 .ToList();
 
             Console.WriteLine($"Load {sourceFiles.Count} files");
-            sourceFiles.ForEach(x => Console.WriteLine("\t" + x.Name));
 
-
-            var compiler = new CompilerController(result =>
+            new ParserController(sourceFiles, x =>
+            {
+                Console.WriteLine($"{x.Count} tokens found");
+                var compiler = new CompilerController(x, result =>
                 {
                     new VHDLGeneratorController().GenerateCode(result, code =>
                     {
-                        File.WriteAllText(Path.Combine(projectPath, outputFolder, "main.vhd"), code);
+                        Console.WriteLine("Result");
+                        Console.WriteLine("_______________________");
+                        Console.WriteLine(code);
+                        File.WriteAllText(Path.Combine(projectPath, outputFolder, outputFileName), code);
                     });
                 });
-
-            var parser = new ParserController(x =>
-            {
-                Console.WriteLine($"{x.Count} tokens finded");
-                compiler.Start(x);
             });
-
-            parser.Start(sourceFiles);
-
-        }
-
-        public void Run()
-        {
-
         }
     }
 }

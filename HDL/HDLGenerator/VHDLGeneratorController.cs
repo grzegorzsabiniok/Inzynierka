@@ -17,9 +17,7 @@ namespace HDL.HDLGenerator
             var signals = new List<Signal>();
             foreach (var gate in gates)
             {
-                signals.Add(gate.A);
-                signals.Add(gate.B);
-                signals.Add(gate.Y);
+                signals.AddRange(gate.Signals);
             }
 
             signals = signals.Distinct().ToList();
@@ -35,6 +33,7 @@ namespace HDL.HDLGenerator
                 GenerateStandardGate("AND") +
                 GenerateStandardGate("OR") +
                 GenerateStandardGate("XOR") +
+                GenerateStandardGate("NOT") +
 
                 $"library ieee;\n" +
                 $"use ieee.std_logic_1164.all;\n" +
@@ -51,6 +50,7 @@ namespace HDL.HDLGenerator
                 GenerateStandardComponent("AND") +
                 GenerateStandardComponent("OR") +
                 GenerateStandardComponent("XOR") +
+                GenerateStandardComponent("NOT") +
 
                 $"    signal {String.Join(", ", signals.Select(x => x.Name).ToArray())} : std_logic;\n\n" +
                 $"begin\n\n" +
@@ -69,17 +69,33 @@ namespace HDL.HDLGenerator
 
         private string GenerateStandardGate(string gate)
         {
+            if (gate == "NOT")
+            {
+                return
+                    $"library ieee;\n" +
+                    $"use ieee.std_logic_1164.all;\n\n" +
+                    $"entity {gate}_GATE is port(a: in std_logic; y: out std_logic);\n" +
+                    $"end {gate}_GATE;\n" +
+                    $"\n" +
+                    $"architecture {gate}_GATE_BEHAVIOUR of {gate}_GATE is\n" +
+                    $"    begin\n" +
+                    $"        process(a)\n" +
+                    $"    begin\n" +
+                    $"        y <= not a;\n" +
+                    $"    end process;\n" +
+                    $"end {gate}_GATE_BEHAVIOUR;\n\n";
+            }
             return
                 $"library ieee;\n" +
                 $"use ieee.std_logic_1164.all;\n\n" +
-                $"entity {gate}_GATE is port(x: in std_logic; y: in std_logic; z: out std_logic);\n" +
+                $"entity {gate}_GATE is port(a: in std_logic; b: in std_logic; y: out std_logic);\n" +
                 $"end {gate}_GATE;\n" +
                 $"\n" +
                 $"architecture {gate}_GATE_BEHAVIOUR of {gate}_GATE is\n" +
                 $"    begin\n" +
-                $"        process(x, y)\n" +
+                $"        process(a, b)\n" +
                 $"    begin\n" +
-                $"        z <= x {gate} y;\n" +
+                $"       y <= a {gate} b;\n" +
                 $"    end process;\n" +
                 $"end {gate}_GATE_BEHAVIOUR;\n\n";
         }
@@ -87,14 +103,14 @@ namespace HDL.HDLGenerator
         private string GenerateStandardComponent(string gate)
         {
             return
-                $"component {gate}_GATE is port(x: in std_logic; y: in std_logic; z: out std_logic);\n" +
+                $"component {gate}_GATE is port({String.Join(":std_logic;", Enumerable.Range(0, gate == "NOT" ? 1 : 2).Select(x => (char)(x + 'a')))}:std_logic; y: out std_logic);\n" +
                 $"end component;\n\n";
         }
 
         private string GenerateInstance(Gate gate)
         {
             return
-                $"    {gate.Name} : {gate.Type}_GATE port map(x => {gate.A.Name}, y => {gate.B.Name}, z => {gate.Y.Name});\n";
+                $"    {gate.Name} : {gate.Type}_GATE port map({String.Join(",", Enumerable.Range(0, gate.Signals.Count - 1).Select(x => (char)(x + 'a') + "=>" + gate.Signals[x].Name))}, y => {gate.Signals.Last().Name});\n";
         }
 
 

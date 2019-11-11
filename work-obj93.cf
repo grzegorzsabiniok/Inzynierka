@@ -1,0 +1,15 @@
+v 4
+file / "C:\MyProjects\Inzynierka\HDL\HDL\HDL\bin\Debug\netcoreapp3.0\test\output\main.vhd" "0072cea14fba1bc4916dfced327c0a832af405b6" "20191111112125.682":
+  entity and_gate at 6( 183) + 0 on 67;
+  architecture and_gate_behaviour of and_gate at 12( 319) + 0 on 68;
+  entity or_gate at 20( 471) + 0 on 69;
+  architecture or_gate_behaviour of or_gate at 26( 605) + 0 on 70;
+  entity xor_gate at 34( 753) + 0 on 71;
+  architecture xor_gate_behaviour of xor_gate at 40( 889) + 0 on 72;
+  entity not_gate at 48( 1041) + 0 on 73;
+  architecture not_gate_behaviour of not_gate at 54( 1160) + 0 on 74;
+  entity main at 62( 1308) + 0 on 75;
+  architecture main_behaviour of main at 79( 1667) + 0 on 76;
+file / "C:\MyProjects\Inzynierka\HDL\HDL\HDL\bin\Debug\netcoreapp3.0\test\output\main_tb.vhd" "e9377628b646a362ac0e81d6fc2df5497515312c" "20191111112125.758":
+  entity main_tb at 6( 173) + 0 on 77;
+  architecture behav1 of main_tb at 17( 367) + 0 on 78;

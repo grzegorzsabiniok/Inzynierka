@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using HDL.HDLGenerator;
 using HDL.Parser;
 
 namespace HDL.Compiler
@@ -22,13 +23,13 @@ namespace HDL.Compiler
         private List<Token> tokens;
 
         public static List<Module> Modules = new List<Module>();
+
         public Module(List<Token> tokens)
         {
             this.tokens = tokens;
             Name = this.tokens[0].Value;
             this.tokens.RemoveAt(0);
             this.tokens.Remove(this.tokens.Last());
-            Console.WriteLine(Modules.Count);
             Modules.Add(this);
         }
 
@@ -44,6 +45,7 @@ namespace HDL.Compiler
             tokens.RemoveAt(0);
 
             ProcessInstructions();
+            Gates.ToList().ForEach(x => x.Process());
         }
 
         private void ProcessInstructions()
@@ -90,42 +92,8 @@ namespace HDL.Compiler
                 {
                     gatesTokens.Remove(gatesTokens.Last());
 
-                    var instance = new Instance(gatesTokens);
+                    var instance = new Instance(gatesTokens, this);
                     Gates.Add(instance);
-
-                    gatesTokens.RemoveRange(0, 4);
-                    gatesTokens.Remove(gatesTokens.Last());
-
-                    var splitedByComa = gatesTokens.Aggregate(new List<List<Token>> { new List<Token>() },
-                        (list, v) =>
-                        {
-                            if (v.Value == ",")
-                            {
-                                list.Add(new List<Token>());
-                            }
-                            else
-                            {
-                                list.Last().Add(v);
-                            }
-                            return list;
-                        });
-                    int i = 0;
-                    foreach (var argument in splitedByComa)
-                    {
-                        if (argument.Count > 1)
-                        {
-                            var gate = Gates.First(x => x.Name == argument[0].Value);
-
-                            Links.Add(new Link(instance.Inputs[i], gate.Outputs.First(x => x.Name == argument[2].Value)));
-                        }
-                        else
-                        {
-                            Links.Add(new Link(instance.Inputs[i], Inputs.First(x => x.Name == argument[0].Value)));
-                        }
-
-                        i++;
-                    }
-
                     gatesTokens = new List<Token>();
                 }
             }
@@ -133,22 +101,64 @@ namespace HDL.Compiler
 
         private void ProcessOutput(List<Token> tokens)
         {
-            Pin pin = null;
-            if (tokens.Count == 4)
+            Pin pin = new Pin();
+            bool nested = false;
+            bool negation = false;
+
+            List<Token> nameTokens = new List<Token>();
+
+            for (int i = 0; i < tokens.Count; i++)
             {
-                pin = Inputs.First(x => x.Name == tokens[2].Value);
+
+                if (tokens[i].Value == "!")
+                {
+                    negation = true;
+                    continue;
+                }
+
+                if (tokens[i].Value == ".")
+                {
+                    nested = true;
+                    continue;
+                }
+
+                if (tokens[i].Type == Token.TokenType.Identifier)
+                {
+                    nameTokens.Add(tokens[i]);
+                }
+
+            }
+
+            if (nested)
+            {
+                var gate = Gates.First(x => x.Name == nameTokens[1].Value);
+
+                pin = gate.Outputs.First(x => x.Name == nameTokens[2].Value);
             }
             else
             {
-                var gate = Gates.First(x => x.Name == tokens[2].Value);
+                pin = Inputs.First(x => x.Name == nameTokens[1].Value);
+            }
 
-                pin = gate.Outputs.First(x => x.Name == tokens[4].Value);
+            if (negation)
+            {
+                var negationPin1 = new Pin(pin.Name + "_W");
+                var negationGate = new Negation(negationPin1);
+
+                Links.Add(new Link(
+                    negationPin1,
+                    pin
+                ));
+
+                Gates.Add(negationGate);
+                pin = negationGate.Outputs[0];
             }
 
             Links.Add(new Link(
-                Outputs.First(x => tokens[0].Value == x.Name),
+                Outputs.First(x => nameTokens[0].Value == x.Name),
                 pin
-                ));
+            ));
+
         }
         public override string ToString()
         {

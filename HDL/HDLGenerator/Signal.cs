@@ -13,7 +13,6 @@ namespace HDL.HDLGenerator
         public Signal(string name)
         {
             Name = name;
-            Console.WriteLine(name);
         }
     }
 }
